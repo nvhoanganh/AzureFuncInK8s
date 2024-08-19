@@ -12,7 +12,7 @@
 
 - add this to your Dockerfile, after the base image, replacing the `<LICENSEKEY>` with your ingest license key
 - install NewRelic.Agent.Api package `dotnet add package NewRelic.Agent.Api --version 10.28.0`
-- add 
+- add `[Transaction(Web = true)]` to `[Function(...)]` 
 
 ```csharp
 [Transaction(Web = true)]
