@@ -1,4 +1,4 @@
-# Deploy Sample Azure Function in Docker and install New Relic APM agent
+# Azure Function in Docker + New Relic .NET APM agent instrumentation
 
 ## Setup sample Azure Function in Docker
 
