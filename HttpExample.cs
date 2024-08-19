@@ -2,23 +2,51 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
+using NewRelic;
+using NewRelic.Api.Agent;
 
-namespace AzureFuncInK8s
+namespace AzureFuncInK8s;
+
+public class ChuckNorris
 {
-    public class HttpExample
+    public string value { get; set; }
+}
+public class HttpExample
+{
+    private readonly ILogger<HttpExample> _logger;
+    private readonly FuncDbContext dbContext;
+
+    public HttpExample(ILogger<HttpExample> logger, FuncDbContext context)
     {
-        private readonly ILogger<HttpExample> _logger;
+        _logger = logger;
+        dbContext = context;
+    }
 
-        public HttpExample(ILogger<HttpExample> logger)
+    [Transaction(Web = true)]
+    [Function("HttpExample")]
+    public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequest req)
+    {
+        _logger.LogInformation("C# HTTP trigger function processed a request.");
+        var httpClient = new HttpClient();
+        var finalString = "";
+
+        // talk to Chuck Norris API to get random joke
+        var response = await httpClient.GetAsync("https://api.chucknorris.io/jokes/random");
+        var result = JsonConvert.DeserializeObject<ChuckNorris>(
+            await response.Content.ReadAsStringAsync(), new JsonSerializerSettings { MissingMemberHandling = MissingMemberHandling.Ignore });
+        finalString = $"From External Service (Chuck Norris Joke API):\n\t'{result.value}'";
+
+        // connect to the SQL DB using Entity Framework
+        var dbrequest = await dbContext.TestData.ToListAsync();
+        finalString += "\n\nFrom Azure SQL DB:\n";
+        foreach (var entry in dbrequest)
         {
-            _logger = logger;
+            finalString += $"\t{entry.key} = {entry.value}\n";
         }
 
-        [Function("HttpExample")]
-        public IActionResult Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequest req)
-        {
-            _logger.LogInformation("C# HTTP trigger function processed a request.");
-            return new OkObjectResult("Welcome to Azure Functions!");
-        }
+        return new OkObjectResult(finalString);
     }
 }
+
