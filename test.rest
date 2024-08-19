@@ -1,0 +1,8 @@
+###
+# while running func start
+@host = http://localhost:7071
+# while running inside docker
+@host = http://localhost:8080
+
+###
+GET {{host}}/api/HttpExample
