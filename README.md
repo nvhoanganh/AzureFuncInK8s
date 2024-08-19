@@ -150,4 +150,11 @@ kubectl get service azfunchttpexample --watch --namespace=azfuncdemo
 curl http://EXTERNAL-IP/api/HttpExample
 ```
 
+- You should see something like this in New Relic
+![alt text](image.png)
 
+![alt text](image-1.png)
+
+![alt text](image-2.png)
+
+![alt text](image-3.png)
