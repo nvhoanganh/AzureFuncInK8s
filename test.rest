@@ -4,11 +4,12 @@
 # while running inside local docker (via docker run)
 # @host = http://localhost:8080
 # # # while running in Azure AKS
-# @host = http://20.167.5.143
-
-###
-GET {{host}}/api/HttpExampleChild
+@host = http://20.11.83.209
 
 ###
 GET {{host}}/api/HttpExampleParent
+
+
+###
+GET {{host}}/api/HttpExampleChild
 

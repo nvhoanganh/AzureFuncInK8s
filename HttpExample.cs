@@ -30,13 +30,12 @@ public class HttpExample
     {
         _logger.LogInformation("C# HTTP trigger function processed a request.");
         var httpClient = new HttpClient();
-        var finalString = "";
 
         // talk to Chuck Norris API to get random joke
         var response = await httpClient.GetAsync("https://api.chucknorris.io/jokes/random");
         var result = JsonConvert.DeserializeObject<ChuckNorris>(
             await response.Content.ReadAsStringAsync(), new JsonSerializerSettings { MissingMemberHandling = MissingMemberHandling.Ignore });
-        finalString = $"From External Service (Chuck Norris Joke API):\n\t'{result.value}'";
+        string? finalString = $"From External Service (Chuck Norris Joke API):\n\t'{result.value}'";
 
         // connect to the SQL DB using Entity Framework
         var dbrequest = await dbContext.TestData.ToListAsync();
@@ -53,12 +52,12 @@ public class HttpExample
     [Function("HttpExampleParent")]
     public async Task<IActionResult> RunParent([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequest req)
     {
-        _logger.LogInformation($"C# HTTP trigger parent function, calling child function via host {req.Scheme}://{req.Headers.Host}");
+        _logger.LogInformation($"C# HTTP trigger parent function, calling child function via host http://{Environment.GetEnvironmentVariable("CHILD_SERVICE_HOST")}");
 
         var httpClient = new HttpClient();
 
         // call the child service
-        var response = await httpClient.GetAsync($"{req.Scheme}://{req.Headers.Host}/api/HttpExampleChild");
+        var response = await httpClient.GetAsync($"http://{Environment.GetEnvironmentVariable("CHILD_SERVICE_HOST")}/api/HttpExampleChild");
         var rsp = await response.Content.ReadAsStringAsync();
         var finalString = $"From /api/HttpExampleChild:\n\t'{rsp}'";
 

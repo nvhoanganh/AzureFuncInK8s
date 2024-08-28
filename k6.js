@@ -3,14 +3,15 @@ import { sleep } from 'k6';
 
 export default function () {
     // Replace with your target URL
-    const url = `http://${__ENV.PUBLIC_IP}/api/HttpExample`;
+    const url = `http://${__ENV.PUBLIC_IP}/api/HttpExampleParent`;
+    const childUrlDirect = `http://${__ENV.PUBLIC_IP}/api/HttpExampleChild`;
 
     // Make a GET request to the URL
     let response = http.get(url);
 
     // Log the response status (optional)
-    console.log(`Status: ${response.status}:\n${response.body}`);
+    console.log(`Calling /api/HttpExampleParent: ${response.status}:\n${response.body}`);
 
-    // Pause for 1 second between requests (optional)
+    // Pause for 2 second between requests (optional)
     sleep(1);
 }

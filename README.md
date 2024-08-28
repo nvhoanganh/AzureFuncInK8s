@@ -136,37 +136,29 @@ kubectl create namespace azfuncdemo
 # deploy the Azfunction app
 kubectl apply -f azfunctionhttp.yaml --namespace=azfuncdemo
 
-# set license key via env variable
+# set license key via env variable for the child service
 kubectl set env deployment/azfunchttpexample \
+    NEW_RELIC_APP_NAME="Azure Function in Docker Sample" \
     NEW_RELIC_LICENSE_KEY=<YOUR_NR_INGEST_API> \
     AzureWebJobsStorage=<StorageAccount> \
     SqlConnection=<SQLConnection> \
+    --namespace=azfuncdemo
+
+# set license key via env variable for the parent service, also specify the URL for the parent to talk to the child service
+kubectl set env deployment/azfunchttpexampleparent \
+    NEW_RELIC_APP_NAME="Azure Function in Docker Sample - Parent" \
+    NEW_RELIC_LICENSE_KEY=<YOUR_NR_INGEST_API> \
+    AzureWebJobsStorage=<StorageAccount> \
+    SqlConnection=<SQLConnection> \
+    CHILD_SERVICE_HOST="childservice" \
     --namespace=azfuncdemo
 
 # get the external API 
 kubectl get service azfunchttpexample --watch --namespace=azfuncdemo
 
 # call the API
-curl http://EXTERNAL-IP/api/HttpExample
-
-# install k6 (https://k6.io/docs/getting-started/installation/)
-brew install k6
-
-# set the public IP so that we can hit it via the k6 load test file
-set PUBLIC_IP=<Public IP>
-
-# Run the load tests
-k6 run --vus 5 --duration 30s k6.js
+curl http://EXTERNAL-IP/api/HttpExampleParent
 ```
-
-- You should see something like this in New Relic
-![alt text](image.png)
-
-![alt text](image-1.png)
-
-![alt text](image-2.png)
-
-![alt text](image-3.png)
 
 ## Deploy New Relic k8s monitoring with Pixie (eBPF) via Helm3
 ```bash
@@ -196,4 +188,31 @@ kubectl create namespace newrelic ; helm upgrade --install newrelic-bundle newre
  --set pixie-chart.enabled=true \
  --set pixie-chart.deployKey=px-dep-.... \
  --set pixie-chart.clusterName=NewRelicAKSDemo
+```
+
+## Autoscale the containers to handle more loads
+
+```bash
+# install k6 (https://k6.io/docs/getting-started/installation/)
+brew install k6
+
+# set the public IP so that we can hit it via the k6 load test file
+set PUBLIC_IP=<Public IP>
+
+# Run small load test for 5 minutes, 1 Virtual user sending 1 request per second
+k6 run --vus 1 --duration 300s k6.js
+
+# use New Relic and monitor the golden metrics (low response time, 0% error rate)
+
+# Increase the load to 5 Virtual users, you will notice requests start failing
+k6 run --vus 5 --duration 3000s k6.js
+
+# while the test is running (and failing), use autoscale to increate the number of pods for both child and parent service
+kubectl autoscale deployment azfunchttpexample --cpu-percent=90 --min=1 --max=10 -n azfuncdemo
+kubectl autoscale deployment azfunchttpexampleparent --cpu-percent=90 --min=1 --max=5 -n azfuncdemo
+
+# watch number of pods increase as we increase throughput
+kubectl get hpa -n azfuncdemo
+
+# notice now error rates goes back down to 0
 ```
