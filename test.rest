@@ -2,10 +2,13 @@
 # while running func start (via func start)
 @host = http://localhost:7071
 # while running inside local docker (via docker run)
-@host = http://localhost:8080
-# # while running in Azure AKS
-@host = http://20.167.5.143
+# @host = http://localhost:8080
+# # # while running in Azure AKS
+# @host = http://20.167.5.143
 
 ###
-GET {{host}}/api/HttpExample
+GET {{host}}/api/HttpExampleChild
+
+###
+GET {{host}}/api/HttpExampleParent
 

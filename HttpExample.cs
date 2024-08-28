@@ -25,7 +25,7 @@ public class HttpExample
     }
 
     [Transaction(Web = true)]
-    [Function("HttpExample")]
+    [Function("HttpExampleChild")]
     public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequest req)
     {
         _logger.LogInformation("C# HTTP trigger function processed a request.");
@@ -45,6 +45,22 @@ public class HttpExample
         {
             finalString += $"\t{entry.key} = {entry.value}\n";
         }
+
+        return new OkObjectResult(finalString);
+    }
+
+    [Transaction(Web = true)]
+    [Function("HttpExampleParent")]
+    public async Task<IActionResult> RunParent([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequest req)
+    {
+        _logger.LogInformation($"C# HTTP trigger parent function, calling child function via host {req.Scheme}://{req.Headers.Host}");
+
+        var httpClient = new HttpClient();
+
+        // call the child service
+        var response = await httpClient.GetAsync($"{req.Scheme}://{req.Headers.Host}/api/HttpExampleChild");
+        var rsp = await response.Content.ReadAsStringAsync();
+        var finalString = $"From /api/HttpExampleChild:\n\t'{rsp}'";
 
         return new OkObjectResult(finalString);
     }

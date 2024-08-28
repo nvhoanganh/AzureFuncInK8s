@@ -148,6 +148,15 @@ kubectl get service azfunchttpexample --watch --namespace=azfuncdemo
 
 # call the API
 curl http://EXTERNAL-IP/api/HttpExample
+
+# install k6 (https://k6.io/docs/getting-started/installation/)
+brew install k6
+
+# set the public IP so that we can hit it via the k6 load test file
+set PUBLIC_IP=<Public IP>
+
+# Run the load tests
+k6 run --vus 5 --duration 30s k6.js
 ```
 
 - You should see something like this in New Relic
@@ -158,3 +167,33 @@ curl http://EXTERNAL-IP/api/HttpExample
 ![alt text](image-2.png)
 
 ![alt text](image-3.png)
+
+## Deploy New Relic k8s monitoring with Pixie (eBPF) via Helm3
+```bash
+
+# use the guided install on the New Relic UI to get the following command
+
+# run this command to install the new relic bundle via helm chart
+set KSM_IMAGE_VERSION v2.10.0
+
+helm repo add newrelic https://helm-charts.newrelic.com && helm repo update && \
+kubectl create namespace newrelic ; helm upgrade --install newrelic-bundle newrelic/nri-bundle \
+ --set global.licenseKey=....FFFFNRAL \
+ --set global.cluster=NewRelicAKSDemo \
+ --namespace=newrelic \
+ --set newrelic-infrastructure.privileged=true \
+ --set global.lowDataMode=true \
+ --set kube-state-metrics.image.tag=$KSM_IMAGE_VERSION \
+ --set kube-state-metrics.enabled=true \
+ --set kubeEvents.enabled=true \
+ --set newrelic-prometheus-agent.enabled=true \
+ --set newrelic-prometheus-agent.lowDataMode=true \
+ --set newrelic-prometheus-agent.config.kubernetes.integrations_filter.enabled=false \
+ --set logging.enabled=true \
+ --set newrelic-logging.lowDataMode=false \
+ --set newrelic-pixie.enabled=true \
+ --set newrelic-pixie.apiKey=px-api-.... \
+ --set pixie-chart.enabled=true \
+ --set pixie-chart.deployKey=px-dep-.... \
+ --set pixie-chart.clusterName=NewRelicAKSDemo
+```
