@@ -17,7 +17,7 @@ spec:
         'kubernetes.io/os': linux
       containers:
         - name: azfunchttpexample
-          image: nvhoanganh1909/azurefuncdockernewrelicwithapmlinux:v1.0.4
+          image: nvhoanganh1909/azurefuncdockernewrelicwithapmlinux:v1.0.5
           env:
             - name: NEW_RELIC_APP_NAME
               value: "Azure Function in Docker Sample"
@@ -26,8 +26,8 @@ spec:
               cpu: 100m
               memory: 128Mi
             limits:
-              cpu: 250m
-              memory: 256Mi
+              cpu: 400m
+              memory: 400Mi
           ports:
             - containerPort: 80
 ---
@@ -50,7 +50,7 @@ spec:
         'kubernetes.io/os': linux
       containers:
         - name: azfunchttpexampleparent
-          image: nvhoanganh1909/azurefuncdockernewrelicwithapmlinux:v1.0.4
+          image: nvhoanganh1909/azurefuncdockernewrelicwithapmlinux:v1.0.5
           env:
             - name: NEW_RELIC_APP_NAME
               value: "Azure Function in Docker Sample - Parent"
@@ -61,7 +61,7 @@ spec:
               cpu: 100m
               memory: 128Mi
             limits:
-              cpu: 250m
+              cpu: 200m
               memory: 256Mi
           ports:
             - containerPort: 80

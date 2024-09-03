@@ -263,3 +263,5 @@ paket-files/
 __pycache__/
 *.pyc
 bash.sh
+_azfunctionhttp.yaml
+_azfunctionhttpai.yaml

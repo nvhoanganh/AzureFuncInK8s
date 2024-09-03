@@ -6,7 +6,7 @@
 # # # while running in Azure AKS
 # this is the AI endpoint
 # @host = http://4.237.144.200
-# # this is the New Relic endpoint
+# # # this is the New Relic endpoint
 # @host = http://4.200.97.152
 
 ###
