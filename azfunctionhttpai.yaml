@@ -1,26 +1,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: azfuncdemo
-  name: azfunchttpexample
+  namespace: azfuncdemoai
+  name: azfunchttpexampleai
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: azfunchttpexample
+      app: azfunchttpexampleai
   template:
     metadata:
       labels:
-        app: azfunchttpexample
+        app: azfunchttpexampleai
     spec:
       nodeSelector:
         'kubernetes.io/os': linux
       containers:
-        - name: azfunchttpexample
-          image: nvhoanganh1909/azurefuncdockernewrelicwithapmlinux:v1.0.4
-          env:
-            - name: NEW_RELIC_APP_NAME
-              value: "Azure Function in Docker Sample"
+        - name: azfunchttpexampleai
+          image: nvhoanganh1909/azurefuncdockerailinux:v1.0.0
           resources:
             requests:
               cpu: 100m
@@ -34,28 +31,26 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: azfuncdemo
-  name: azfunchttpexampleparent
+  namespace: azfuncdemoai
+  name: azfunchttpexampleparentai
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: azfunchttpexampleparent
+      app: azfunchttpexampleparentai
   template:
     metadata:
       labels:
-        app: azfunchttpexampleparent
+        app: azfunchttpexampleparentai
     spec:
       nodeSelector:
         'kubernetes.io/os': linux
       containers:
-        - name: azfunchttpexampleparent
-          image: nvhoanganh1909/azurefuncdockernewrelicwithapmlinux:v1.0.4
+        - name: azfunchttpexampleparentai
+          image: nvhoanganh1909/azurefuncdockerailinux:v1.0.0
           env:
-            - name: NEW_RELIC_APP_NAME
-              value: "Azure Function in Docker Sample - Parent"
             - name: CHILD_SERVICE_HOST
-              value: "childservice"
+              value: "childserviceai"
           resources:
             requests:
               cpu: 100m
@@ -69,26 +64,26 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: childservice
+  name: childserviceai
 spec:
   selector:
-    app: azfunchttpexample
+    app: azfunchttpexampleai
   ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 80
+  - protocol: TCP
+    port: 80
+    targetPort: 80
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: azfunchttpexampleparent
+  name: azfunchttpexampleparentai
   annotations:
     prometheus.io/scrape: 'true'
   labels:
-    name: azfunchttpexampleparent
+    name: azfunchttpexampleparentai
 spec:
   type: LoadBalancer
   ports:
     - port: 80
   selector:
-    app: azfunchttpexampleparent
+    app: azfunchttpexampleparentai

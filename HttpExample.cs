@@ -38,7 +38,8 @@ public class HttpExample
         string? finalString = $"From External Service (Chuck Norris Joke API):\n\t'{result.value}'";
 
         // connect to the SQL DB using Entity Framework
-        var dbrequest = await dbContext.TestData.ToListAsync();
+        var random = Guid.NewGuid().ToString();
+        var dbrequest = await dbContext.TestData.Where(x => x.key.IndexOf(random) < 0).ToListAsync();
         finalString += "\n\nFrom Azure SQL DB:\n";
         foreach (var entry in dbrequest)
         {
