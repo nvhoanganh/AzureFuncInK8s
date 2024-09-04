@@ -24,7 +24,7 @@ public class HttpExample
         dbContext = context;
     }
 
-    [Transaction(Web = true)]
+    [Trace]
     [Function("HttpExampleChild")]
     public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequest req)
     {
@@ -49,7 +49,7 @@ public class HttpExample
         return new OkObjectResult(finalString);
     }
 
-    [Transaction(Web = true)]
+    [Trace]
     [Function("HttpExampleParent")]
     public async Task<IActionResult> RunParent([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequest req)
     {
@@ -66,7 +66,7 @@ public class HttpExample
     }
 
     // background transaction (non Web)
-    [Transaction]
+    [Trace]
     [Function("QueueExampleParent")]
     [QueueOutput("testoutputqueue")]
     public async Task<string> RunQueueHandler([QueueTrigger("%QUEUE_NAME%")] string queueMessage, FunctionContext context)
