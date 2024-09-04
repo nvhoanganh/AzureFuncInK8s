@@ -28,7 +28,7 @@ public class HttpExample
     [Function("HttpExampleChild")]
     public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequest req)
     {
-        _logger.LogInformation("C# HTTP trigger function processed a request.");
+        _logger.LogWarning("C# HTTP trigger function processed a request.");
         var httpClient = new HttpClient();
 
         // talk to Chuck Norris API to get random joke
@@ -53,7 +53,7 @@ public class HttpExample
     [Function("HttpExampleParent")]
     public async Task<IActionResult> RunParent([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequest req)
     {
-        _logger.LogInformation($"C# HTTP trigger parent function, calling child function via host http://{Environment.GetEnvironmentVariable("CHILD_SERVICE_HOST")}");
+        _logger.LogWarning($"C# HTTP trigger parent function, calling child function via host http://{Environment.GetEnvironmentVariable("CHILD_SERVICE_HOST")}");
 
         var httpClient = new HttpClient();
 
@@ -63,6 +63,26 @@ public class HttpExample
         var finalString = $"From /api/HttpExampleChild:\n\t'{rsp}'";
 
         return new OkObjectResult(finalString);
+    }
+
+    // background transaction (non Web)
+    [Transaction]
+    [Function("QueueExampleParent")]
+    [QueueOutput("testoutputqueue")]
+    public async Task<string> RunQueueHandler([QueueTrigger("testqueue")] string queueMessage, FunctionContext context)
+    {
+        // Use a string array to return more than one message.
+        _logger.LogWarning($"C# Queue trigger parent function with input '{queueMessage}', calling child function via host http://{Environment.GetEnvironmentVariable("CHILD_SERVICE_HOST")}");
+
+        var httpClient = new HttpClient();
+
+        // call the child service
+        var response = await httpClient.GetAsync($"http://{Environment.GetEnvironmentVariable("CHILD_SERVICE_HOST")}/api/HttpExampleChild");
+        var rsp = await response.Content.ReadAsStringAsync();
+        var finalString = $"Input from queue: {queueMessage}\nFrom /api/HttpExampleChild:\n\t'{rsp}'";
+
+        // Queue Output messages
+        return finalString;
     }
 }
 

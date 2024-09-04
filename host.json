@@ -2,13 +2,13 @@
 	"version": "2.0",
 	"logging": {
 		"logLevel": {
-			"Function": "Trace",
-			"default": "Information"
+			"Function": "Warning",
+			"default": "Warning"
 		},
 		"applicationInsights": {
 			"samplingSettings": {
 				"isEnabled": false,
-				"loggingLevel": "Information",
+				"loggingLevel": "Warning",
 				"excludedTypes": "Request"
 			},
 			"enableLiveMetricsFilters": true
