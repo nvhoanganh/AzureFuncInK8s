@@ -69,17 +69,17 @@ public class HttpExample
     [Transaction]
     [Function("QueueExampleParent")]
     [QueueOutput("testoutputqueue")]
-    public async Task<string> RunQueueHandler([QueueTrigger("testqueue")] string queueMessage, FunctionContext context)
+    public async Task<string> RunQueueHandler([QueueTrigger("%QUEUE_NAME%")] string queueMessage, FunctionContext context)
     {
         // Use a string array to return more than one message.
-        _logger.LogWarning($"C# Queue trigger parent function with input '{queueMessage}', calling child function via host http://{Environment.GetEnvironmentVariable("CHILD_SERVICE_HOST")}");
+        _logger.LogWarning($"C# Queue trigger parent function with input '{queueMessage}' via queue name {Environment.GetEnvironmentVariable("QUEUE_NAME")}, calling child function via host http://{Environment.GetEnvironmentVariable("CHILD_SERVICE_HOST")}");
 
         var httpClient = new HttpClient();
 
         // call the child service
         var response = await httpClient.GetAsync($"http://{Environment.GetEnvironmentVariable("CHILD_SERVICE_HOST")}/api/HttpExampleChild");
         var rsp = await response.Content.ReadAsStringAsync();
-        var finalString = $"Input from queue: {queueMessage}\nFrom /api/HttpExampleChild:\n\t'{rsp}'";
+        var finalString = $"Input from queue: {queueMessage} (queueName: {Environment.GetEnvironmentVariable("QUEUE_NAME")})\nFrom /api/HttpExampleChild:\n\t'{rsp}'";
 
         // Queue Output messages
         return finalString;
