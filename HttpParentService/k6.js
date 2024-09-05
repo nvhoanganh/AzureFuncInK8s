@@ -12,5 +12,19 @@ export default function () {
     console.log(`Calling http://${__ENV.PUBLIC_IP}/api/HttpExampleParent: ${response.status}:\n${response.body}`);
 
     // Pause for 2 second between requests (optional)
-    sleep(5);
+    sleep(1);
+
+    // send via queue message
+    var dateString = (new Date()).getTime();
+    // Replace with your target URL
+    url = `http://${__ENV.PUBLIC_IP2}/api/AsyncViaQueue?query=${dateString}`;
+
+    // Make a GET request to the URL
+    response = http.get(url);
+
+    // Log the response status (optional)
+    console.log(`Calling http://${__ENV.PUBLIC_IP2}/api/AsyncViaQueue: ${response.status}:\n${response.body}`);
+
+    // Pause for 2 second between requests (optional)
+    sleep(3);
 }
