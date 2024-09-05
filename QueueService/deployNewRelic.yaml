@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: azfuncdemo
+  name: azfunchttpexamplequeueconsumer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: azfunchttpexamplequeueconsumer
+  template:
+    metadata:
+      labels:
+        app: azfunchttpexamplequeueconsumer
+    spec:
+      nodeSelector:
+        'kubernetes.io/os': linux
+      containers:
+        - name: azfunchttpexamplequeueconsumer
+          image: nvhoanganh1909/azurefuncdockernewrelicwithapmlinux:v1.0.14
+          env:
+            - name: NEW_RELIC_APP_NAME
+              value: "Azure Function in Docker Sample - Queue Consumer"
+            - name: NEW_RELIC_LICENSE_KEY
+              value: "licence"
+            - name: AzureWebJobsStorage
+              value: "connection"
+            - name: QUEUE_NAME
+              value: "testqueuenewrelic"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi
+          ports:
+            - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: azfunchttpexamplequeueconsumer
+  annotations:
+    prometheus.io/scrape: 'true'
+  labels:
+    name: azfunchttpexamplequeueconsumer
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 80
+  selector:
+    app: azfunchttpexamplequeueconsumer

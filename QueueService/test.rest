@@ -1,0 +1,7 @@
+###
+# while running func start (via func start)
+@host = http://localhost:7071
+@hostQueue = http://20.227.74.15
+
+###
+GET {{hostQueue}}/api/AsyncViaQueue?query=Anthony
