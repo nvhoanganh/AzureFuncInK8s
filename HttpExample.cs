@@ -13,6 +13,12 @@ public class ChuckNorris
 {
     public string value { get; set; }
 }
+public class QueueMessagePayload
+{
+    public string message { get; set; }
+    public Dictionary<string, string> headers { get; set; }
+}
+
 public class HttpExample
 {
     private readonly ILogger<HttpExample> _logger;
@@ -72,17 +78,57 @@ public class HttpExample
     public async Task<string> RunQueueHandler([QueueTrigger("%QUEUE_NAME%")] string queueMessage, FunctionContext context)
     {
         // Use a string array to return more than one message.
-        _logger.LogWarning($"C# Queue trigger parent function with input '{queueMessage}' via queue name {Environment.GetEnvironmentVariable("QUEUE_NAME")}, calling child function via host http://{Environment.GetEnvironmentVariable("CHILD_SERVICE_HOST")}");
+        var request = JsonConvert.DeserializeObject<QueueMessagePayload>(queueMessage);
+
+        // accept the DT headers as per https://docs.newrelic.com/docs/apm/agents/net-agent/net-agent-api/net-agent-api/#AcceptDistributedTraceHeaders
+        IAgent agent = NewRelic.Api.Agent.NewRelic.GetAgent();
+        ITransaction currentTransaction = agent.CurrentTransaction;
+        currentTransaction.AcceptDistributedTraceHeaders(request, Getter, TransportType.Queue);
+        IEnumerable<string> Getter(QueueMessagePayload msg, string key)
+        {
+            string value = msg.headers[key];
+            if (value != null)
+            {
+                _logger.LogWarning($"New Relic DT header {key} = {value}");
+            }
+            return value == null ? null : new string[] { value };
+        }
+
+        var msg = request.message;
+        _logger.LogWarning($"C# Queue trigger parent function with input '{msg}' via queue name {Environment.GetEnvironmentVariable("QUEUE_NAME")}, calling child function via host http://{Environment.GetEnvironmentVariable("CHILD_SERVICE_HOST")}");
 
         var httpClient = new HttpClient();
 
         // call the child service
         var response = await httpClient.GetAsync($"http://{Environment.GetEnvironmentVariable("CHILD_SERVICE_HOST")}/api/HttpExampleChild");
         var rsp = await response.Content.ReadAsStringAsync();
-        var finalString = $"Input from queue: {queueMessage} (queueName: {Environment.GetEnvironmentVariable("QUEUE_NAME")})\nFrom /api/HttpExampleChild:\n\t'{rsp}'";
+        var finalString = $"Input from queue: {msg} (queueName: {Environment.GetEnvironmentVariable("QUEUE_NAME")})\nFrom /api/HttpExampleChild:\n\t'{rsp}'";
 
         // Queue Output messages
         return finalString;
+    }
+
+    // HTTP triggered function which send message to a child service via a storage queue
+    [Trace]
+    [Function("AsyncViaQueue")]
+    [QueueOutput("%QUEUE_NAME%")]
+    public string AsyncViaQueue([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequest req)
+    {
+        // Use a string array to return more than one message.
+        _logger.LogWarning($"C# HTTP trigger parent function with query string '{req.Query["query"]}', sending request via queue name {Environment.GetEnvironmentVariable("QUEUE_NAME")}");
+
+        var payload = new QueueMessagePayload { message = $"Sent via '{Environment.GetEnvironmentVariable("QUEUE_NAME")}' queue from HTTP trigger" };
+
+        // set the distributed tracing headers using the New Relic SDK as per https://docs.newrelic.com/docs/apm/agents/net-agent/net-agent-api/net-agent-api/#InsertDistributedTraceHeaders
+        IAgent agent = NewRelic.Api.Agent.NewRelic.GetAgent();
+        ITransaction currentTransaction = agent.CurrentTransaction;
+        var setter = new Action<QueueMessagePayload, string, string>((carrier, key, value) => { carrier.headers.Add(key, value); });
+        currentTransaction.InsertDistributedTraceHeaders(payload, setter);
+
+        var payloadMsg = JsonConvert.SerializeObject(payload);
+        _logger.LogWarning($"Sending the following mesage via '{Environment.GetEnvironmentVariable("QUEUE_NAME")}' queue:\n {payloadMsg}");
+        // Queue Output messages
+        return payloadMsg;
     }
 }
 

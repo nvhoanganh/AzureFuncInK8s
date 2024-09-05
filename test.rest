@@ -5,14 +5,12 @@
 # @host = http://localhost:8080
 # # # while running in Azure AKS
 # this is the AI endpoint
-@host = http://4.237.144.200
-# # # this is the New Relic endpoint
-@host = http://4.200.97.152
+# @host = http://4.237.144.200
+# # # # this is the New Relic endpoint
+# @host = http://4.200.97.152
 
 ###
 GET {{host}}/api/HttpExampleParent
 
-
 ###
-GET {{host}}/api/HttpExampleChild
-
+GET {{host}}/api/AsyncViaQueue?query=Hello
