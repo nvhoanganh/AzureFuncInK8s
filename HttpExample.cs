@@ -30,7 +30,7 @@ public class HttpExample
         dbContext = context;
     }
 
-    [Trace]
+    [Transaction(Web = true)]
     [Function("HttpExampleChild")]
     public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequest req)
     {
@@ -55,11 +55,15 @@ public class HttpExample
         return new OkObjectResult(finalString);
     }
 
-    [Trace]
+    [Transaction(Web = true)]
     [Function("HttpExampleParent")]
     public async Task<IActionResult> RunParent([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequest req)
     {
         _logger.LogWarning($"C# HTTP trigger parent function, calling child function via host http://{Environment.GetEnvironmentVariable("CHILD_SERVICE_HOST")}");
+
+        IAgent agent = NewRelic.Api.Agent.NewRelic.GetAgent();
+        ITransaction currentTransaction = agent.CurrentTransaction;
+        _logger.LogWarning(JsonConvert.SerializeObject(currentTransaction));
 
         var httpClient = new HttpClient();
 
@@ -72,7 +76,7 @@ public class HttpExample
     }
 
     // background transaction (non Web)
-    [Trace]
+    [Transaction]
     [Function("QueueExampleParent")]
     [QueueOutput("testoutputqueue")]
     public async Task<string> RunQueueHandler([QueueTrigger("%QUEUE_NAME%")] string queueMessage, FunctionContext context)
@@ -109,24 +113,30 @@ public class HttpExample
     }
 
     // HTTP triggered function which send message to a child service via a storage queue
-    [Trace]
+    [Transaction(Web = true)]
     [Function("AsyncViaQueue")]
     [QueueOutput("%QUEUE_NAME%")]
     public string AsyncViaQueue([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequest req)
     {
         // Use a string array to return more than one message.
-        _logger.LogWarning($"C# HTTP trigger parent function with query string '{req.Query["query"]}', sending request via queue name {Environment.GetEnvironmentVariable("QUEUE_NAME")}");
+        var queueName = Environment.GetEnvironmentVariable("QUEUE_NAME");
+        _logger.LogWarning($"C# HTTP trigger parent function with query string '{req.Query["query"]}', sending request via queue name {queueName}");
 
-        var payload = new QueueMessagePayload { message = $"Sent via '{Environment.GetEnvironmentVariable("QUEUE_NAME")}' queue from HTTP trigger" };
+        var payload = new QueueMessagePayload { message = $"Sent via '{queueName}' queue from HTTP trigger", headers = new Dictionary<string, string>() };
 
-        // set the distributed tracing headers using the New Relic SDK as per https://docs.newrelic.com/docs/apm/agents/net-agent/net-agent-api/net-agent-api/#InsertDistributedTraceHeaders
+        // https://docs.newrelic.com/docs/apm/agents/net-agent/net-agent-api/net-agent-api/#InsertDistributedTraceHeaders
         IAgent agent = NewRelic.Api.Agent.NewRelic.GetAgent();
         ITransaction currentTransaction = agent.CurrentTransaction;
-        var setter = new Action<QueueMessagePayload, string, string>((carrier, key, value) => { carrier.headers.Add(key, value); });
+        _logger.LogWarning(JsonConvert.SerializeObject(currentTransaction));
+        var setter = new Action<QueueMessagePayload, string, string>((carrier, key, value) =>
+        {
+            _logger.LogWarning($"Adding trace header '{key}' = {value} to the message before sending it off to the '{queueName}' queue");
+            carrier.headers.Add(key, value);
+        });
         currentTransaction.InsertDistributedTraceHeaders(payload, setter);
 
         var payloadMsg = JsonConvert.SerializeObject(payload);
-        _logger.LogWarning($"Sending the following mesage via '{Environment.GetEnvironmentVariable("QUEUE_NAME")}' queue:\n {payloadMsg}");
+        _logger.LogWarning($"Sending the following mesage via '{queueName}' queue:\n {payloadMsg}");
         // Queue Output messages
         return payloadMsg;
     }
