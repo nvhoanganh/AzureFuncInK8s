@@ -216,10 +216,3 @@ kubectl get hpa -n azfuncdemo
 
 # notice now error rates goes back down to 0
 ```
-
-# Add storage queue trigger
-
-```bash
-# send "Hello" to the queue using az cli
-az storage message put --content "SGVsbG8=" --queue-name testqueue --account-name anthonytestazurefunction --account-key <KEY>
-```
