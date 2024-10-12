@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
-using NewRelic.Api.Agent;
 
 namespace AzureFuncInK8s;
 
@@ -24,7 +23,6 @@ public class HttpExample
         dbContext = context;
     }
 
-    [Transaction(Web = true)]
     [Function("HttpExampleChild")]
     public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequest req)
     {

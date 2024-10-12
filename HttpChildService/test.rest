@@ -1,7 +1,7 @@
 ###
 # while running func start (via func start)
 @host = http://localhost:7071
-@host = http://4.200.97.152
+# @host = http://4.200.97.152
 
 ###
-GET {{host}}/api/HttpExampleParent
+GET {{host}}/api/HttpExampleChild
