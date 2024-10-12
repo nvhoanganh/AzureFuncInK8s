@@ -19,6 +19,14 @@ spec:
         - name: azfunchttpexample
           image: nvhoanganh1909/azurefuncdockernewrelicchildlinux:v1.0.15
           env:
+            - name: NEW_RELIC_APPLICATION_LOGGING_ENABLED
+              value: "true"
+            - name: NEW_RELIC_APPLICATION_LOGGING_FORWARDING_ENABLED
+              value: "true"
+            - name: NEW_RELIC_APPLICATION_LOGGING_FORWARDING_MAX_SAMPLES_STORED
+              value: "10000"
+            - name: NEW_RELIC_APPLICATION_LOGGING_LOCAL_DECORATING_ENABLED
+              value: "false"
             - name: NEW_RELIC_AZURE_FUNCTION_MODE_ENABLED
               value: "1"
             - name: NEW_RELIC_APP_NAME
