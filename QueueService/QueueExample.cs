@@ -25,7 +25,6 @@ public class QueueExample
 
 
     // HTTP triggered function which send message to a child service via a storage queue
-    [Transaction(Web = true)]
     [Function("AsyncViaQueue")]
     [QueueOutput("%QUEUE_NAME%")]
     public string AsyncViaQueue([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequest req)

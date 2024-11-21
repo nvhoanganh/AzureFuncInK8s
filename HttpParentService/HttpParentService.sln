@@ -1,0 +1,42 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.002.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureFuncInK8s", "AzureFuncInK8s.csproj", "{C1F7DE50-5374-41A7-8A0B-32A32D8C0477}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "obj", "obj", "{1638ADF3-E537-420A-9DD6-3B7DFBB83969}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Debug", "Debug", "{5FA16ACE-7D6E-4EED-8962-4529B2E1810E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "net8.0", "net8.0", "{DE3011A5-C8AD-44AD-AC51-2C79F1CFF6A2}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorkerExtensions", "obj\Debug\net8.0\WorkerExtensions\WorkerExtensions.csproj", "{6607C881-55D8-488A-AD33-A7C8568016E1}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C1F7DE50-5374-41A7-8A0B-32A32D8C0477}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C1F7DE50-5374-41A7-8A0B-32A32D8C0477}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C1F7DE50-5374-41A7-8A0B-32A32D8C0477}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C1F7DE50-5374-41A7-8A0B-32A32D8C0477}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6607C881-55D8-488A-AD33-A7C8568016E1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6607C881-55D8-488A-AD33-A7C8568016E1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6607C881-55D8-488A-AD33-A7C8568016E1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6607C881-55D8-488A-AD33-A7C8568016E1}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{5FA16ACE-7D6E-4EED-8962-4529B2E1810E} = {1638ADF3-E537-420A-9DD6-3B7DFBB83969}
+		{DE3011A5-C8AD-44AD-AC51-2C79F1CFF6A2} = {5FA16ACE-7D6E-4EED-8962-4529B2E1810E}
+		{6607C881-55D8-488A-AD33-A7C8568016E1} = {DE3011A5-C8AD-44AD-AC51-2C79F1CFF6A2}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7D5D6A6A-6931-42FA-9C3F-2EC42BA60B6D}
+	EndGlobalSection
+EndGlobal

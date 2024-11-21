@@ -1,4 +1,4 @@
-version=1.0.14
+version=1.0.16
 # build
 docker build --tag nvhoanganh1909/azurefuncdockernewrelicparentlinux:v$version . -f DockerfileLinux
 

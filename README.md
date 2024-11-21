@@ -11,19 +11,6 @@
 ## Adding new Relic agent (via docker)
 
 - add this to your Dockerfile, after the base image, replacing the `<LICENSEKEY>` with your ingest license key
-- install NewRelic.Agent.Api package `dotnet add package NewRelic.Agent.Api --version 10.28.0`
-- add `[Transaction(Web = true)]` to `[Function(...)]` 
-
-```csharp
-[Transaction(Web = true)]
-[Function("HttpExample")]
-public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequest req)
-{
-    ...
-}
-```
-
-- update the Dockerfile
 ```Dockerfile
 
 # Install the agent
@@ -90,7 +77,6 @@ public class TESTDATA
 }
 
 > HttpExample.cs
-[Transaction(Web = true)]
 [Function("HttpExample")]
 public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequest req)
 {
