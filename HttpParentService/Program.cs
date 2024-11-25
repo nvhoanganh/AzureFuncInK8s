@@ -7,14 +7,14 @@ var host = new HostBuilder()
     .ConfigureFunctionsWebApplication()
     .ConfigureServices(services =>
     {
-        services.AddApplicationInsightsTelemetryWorkerService();
+        // services.AddApplicationInsightsTelemetryWorkerService();
         services.ConfigureFunctionsApplicationInsights();
-        services.AddLogging(loggingBuilder =>
-        {
-            loggingBuilder.AddApplicationInsights();
-            // Set the minimum logging level to Information
-            loggingBuilder.SetMinimumLevel(LogLevel.Information);
-        });
+        // services.AddLogging(loggingBuilder =>
+        // {
+        //     loggingBuilder.AddApplicationInsights();
+        //     // Set the minimum logging level to Information
+        //     loggingBuilder.SetMinimumLevel(LogLevel.Information);
+        // });
     })
     .Build();
 

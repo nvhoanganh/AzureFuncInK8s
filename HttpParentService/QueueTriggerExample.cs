@@ -38,12 +38,12 @@ public class QueueTriggerExample
         {
             string value = msg.headers[key];
             if (value != null)
-                _logger.LogWarning($"New Relic DT header {key} = {value}");
+                _logger.LogInformation($"New Relic DT header {key} = {value}");
             return value == null ? null : new string[] { value };
         }
 
         var msg = request.message;
-        _logger.LogWarning($"C# Queue trigger parent function with input '{msg}' via queue name {Environment.GetEnvironmentVariable("QUEUE_NAME")}, calling child function via host http://{Environment.GetEnvironmentVariable("CHILD_SERVICE_HOST")}");
+        _logger.LogInformation($"C# Queue trigger parent function with input '{msg}' via queue name {Environment.GetEnvironmentVariable("QUEUE_NAME")}, calling child function via host http://{Environment.GetEnvironmentVariable("CHILD_SERVICE_HOST")}");
 
         var httpClient = new HttpClient();
 

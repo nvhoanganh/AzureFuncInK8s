@@ -18,7 +18,7 @@ public class HttpExample
     [Function("HttpExampleParent")]
     public async Task<IActionResult> RunParent([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequest req)
     {
-        _logger.LogWarning($"C# HTTP trigger parent function, calling child function via host http://{Environment.GetEnvironmentVariable("CHILD_SERVICE_HOST")}");
+        _logger.LogInformation($"C# HTTP trigger parent function, calling child function via host http://{Environment.GetEnvironmentVariable("CHILD_SERVICE_HOST")}");
 
         var httpClient = new HttpClient();
 
